@@ -1,6 +1,7 @@
 python-dotenv
 langchain
-openai
+sentence_transformers
+huggingface_hub
 youtube-transcript-api
 faiss-cpu
 streamlit

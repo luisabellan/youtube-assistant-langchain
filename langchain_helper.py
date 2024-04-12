@@ -1,15 +1,25 @@
 from langchain.document_loaders import YoutubeLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+
 from langchain.vectorstores import FAISS
-from langchain.llms import OpenAI
+from langchain_community.llms import HuggingFaceEndpoint
 from langchain import PromptTemplate
 from langchain.chains import LLMChain
 from dotenv import load_dotenv
+import os
 
 
 load_dotenv()
-embeddings = OpenAIEmbeddings()
+os.environ['CURL_CA_BUNDLE'] = ''
+
+hugginface_api_key = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+repo_id = "mistralai/Mistral-7B-Instruct-v0.2"
+llm = HuggingFaceEndpoint(repo_id=repo_id, max_length=128, temperature=0.5, token=hugginface_api_key)
+
+
+
+embeddings = HuggingFaceInferenceAPIEmbeddings(api_key=hugginface_api_key)
 
 
 def create_db_from_youtube_video_url(video_url: str) -> FAISS:
@@ -31,8 +41,6 @@ def get_response_from_query(db, query, k=4):
 
     docs = db.similarity_search(query, k=k)
     docs_page_content = " ".join([d.page_content for d in docs])
-
-    llm = OpenAI(model_name="text-davinci-003")
 
     prompt = PromptTemplate(
         input_variables=["question", "docs"],
