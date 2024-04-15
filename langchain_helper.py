@@ -1,7 +1,6 @@
-from langchain.document_loaders import YoutubeLoader
+from langchain_community.document_loaders import YoutubeLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
-
 from langchain.vectorstores import FAISS
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain import PromptTemplate
@@ -9,17 +8,14 @@ from langchain.chains import LLMChain
 from dotenv import load_dotenv
 import os
 
-
 load_dotenv()
 os.environ['CURL_CA_BUNDLE'] = ''
 
-hugginface_api_key = os.getenv("HUGGINGFACEHUB_API_TOKEN")
+huggingface_api_key = os.getenv("HUGGINGFACEHUB_API_TOKEN")
 repo_id = "mistralai/Mistral-7B-Instruct-v0.2"
-llm = HuggingFaceEndpoint(repo_id=repo_id, max_length=128, temperature=0.5, token=hugginface_api_key)
-
-
-
-embeddings = HuggingFaceInferenceAPIEmbeddings(api_key=hugginface_api_key)
+if huggingface_api_key:
+    llm = HuggingFaceEndpoint(repo_id=repo_id, max_length=128, temperature=0.5, token=huggingface_api_key)
+    embeddings = HuggingFaceInferenceAPIEmbeddings(api_key=huggingface_api_key)
 
 
 def create_db_from_youtube_video_url(video_url: str) -> FAISS:
